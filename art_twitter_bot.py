@@ -4,16 +4,19 @@ import requests
 import json
 import random
 import tweepy
+import os
 import time
+from dotenv import load_dotenv
+load_dotenv()
 
 # store our credentials
 def twitter_api():
-    CONSUMER_KEY = '' # 'your API key number here'
-    CONSUMER_SECRET = '' # 'your API secret key number here'
-    ACCESS_KEY = '' # 'your access token here'
-    ACCESS_SECRET = '' # 'your access token secret here'
+    CONSUMER_KEY = os.getenv("CONSUMER_KEY") # 'your API key number here'
+    CONSUMER_SECRET = os.getenv("CONSUMER_SECRET") # 'your API secret key number here'
+    ACCESS_KEY = os.getenv("ACCESS_KEY") # 'your access token here'
+    ACCESS_SECRET = os.getenv("ACCESS_SECRET") # 'your access token secret here'
 
-    # setting up out access to tweepy
+    # setting up our access to tweepy
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
     # api object that interacts with twitter
@@ -46,19 +49,18 @@ def unpack(results):
     random_painting = random.randint(0, 100)
     artwork = results['data'][random_painting]
     tombstone = artwork['tombstone']
-    image = artwork['images']['web']['url']
-    return image, tombstone
-    print(f"{tombstone}\n{image}\n---")
+    image_url = artwork['images']['web']['url']
+    return image_url, tombstone
+    # print(f"{tombstone}\n{image}\n---")
 
 
-def make_tweet(api, image, tombstone):
+def make_tweet(api, image_url, tombstone):
     temp_file = 'temp.jpg'
-    url = image['url']
-    request = requests.get(url, stream=True)
+    request = requests.get(image_url, stream=True)
     if request.status_code == 200:
-        with open(temp_file, 'wb') as painting
-            for chunk in request:
-                image.write(chunk)
+        with open(temp_file, 'wb') as painting: # wb is write in binary mode, so it makes no changes
+            for line in request:
+                painting.write(line)
         api.update_with_media(temp_file, status=tombstone)
         os.remove(temp_file)
     else:
