@@ -5,3 +5,6 @@ https://www.clevelandart.org/open-access
 
 This program accesses the API, picks a painting at random then tweets the image. List of libraries used is included in the requirements.txt file.
 
+![Sargent Portrait of Lisa Colt Curtis](./images/Sargent_portrait_Lisa_Colt_Curtis.PNG)
+![Monet Spring Flowers](./images/monet_spring_flowers.PNG)
+![Borch Portrair of a Woman](./images/Borch_Portrait_of_a_Woman.PNG)
