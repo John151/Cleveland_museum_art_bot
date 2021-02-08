@@ -1,4 +1,6 @@
-"""bot to retrieve data from Cleveland museum of art API"""
+"""bot to retrieve data from Cleveland museum of art API
+    Then pull out information about a random artwork
+    save image of the artwork, and finally tweet the image"""
 
 import requests
 import json
@@ -8,6 +10,14 @@ import os
 import time
 from dotenv import load_dotenv
 load_dotenv()
+
+
+def main():
+    api = twitter_api()
+    results = get_openaccess_results("painting", 0, 100)
+    image, tombstone = unpack(results)
+    make_tweet(api, image, tombstone)
+
 
 # store our credentials
 def twitter_api():
@@ -24,12 +34,6 @@ def twitter_api():
     return api
 
 
-def main():
-    api = twitter_api()
-    results = get_openaccess_results("painting", 0, 100)
-    image, tombstone = unpack(results)
-    make_tweet(api, image, tombstone)
-
 # this function calls the Cleveland Museum open API and gets results
 def get_openaccess_results(medium, skip=0, limit=100):
     url = 'https://openaccess-api.clevelandart.org/api/artworks/?'
@@ -42,6 +46,7 @@ def get_openaccess_results(medium, skip=0, limit=100):
     results = requests.get(url, params=params).json()
     return results
 
+
 # this function unpacks the results we got from the api
 # and chooses one at random
 def unpack(results):
@@ -51,14 +56,13 @@ def unpack(results):
     tombstone = artwork['tombstone']
     image_url = artwork['images']['web']['url']
     return image_url, tombstone
-    # print(f"{tombstone}\n{image}\n---")
 
 
 def make_tweet(api, image_url, tombstone):
     temp_file = 'temp.jpg'
     request = requests.get(image_url, stream=True)
     if request.status_code == 200:
-        with open(temp_file, 'wb') as painting: # wb is write in binary mode, so it makes no changes
+        with open(temp_file, 'wb') as painting:  # wb is write in binary mode, so it makes no changes
             for line in request:
                 painting.write(line)
         api.update_with_media(temp_file, status=tombstone)

@@ -1,3 +1,4 @@
 env/
 .twitter_api_keys.txt
 .env
+.resources_referenced.txt
